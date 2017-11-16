@@ -2,6 +2,8 @@ package de.codecentric.mazes
 
 import spire.math.Natural
 import scala.util.Random
+import cats.Show
+import cats.syntax.show._
 
 case class Cell(row: Natural,
                 col: Natural,
@@ -46,9 +48,9 @@ case class Grid(rows: Int, columns: Int) {
     eachCell { cell =>
       val (row, col) = cell.row -> cell.col
 
-      cell.north = getCell(row - Natural.one, col)
+      cell.north = if (row == Natural.zero) None else getCell(row - Natural.one, col)
       cell.south = getCell(row + Natural.one, col)
-      cell.west = getCell(row, col - Natural.one)
+      cell.west = if (col == Natural.zero) None else getCell(row, col - Natural.one)
       cell.east = getCell(row, col + Natural.one)
     }
   }
@@ -74,4 +76,38 @@ case class Grid(rows: Int, columns: Int) {
 
     getCell(row, col)
   }
+}
+
+object Grid {
+  implicit val gridShow: Show[Grid] = new Show[Grid] {
+    override def show(grid: Grid): String = {
+      var output = "+" + "---+" * grid.columns + "\n"
+
+      grid.eachRow { row =>
+        var top = "|"
+        var bottom = "+"
+
+        row.foreach { cell =>
+          var body = "   "
+          val eastBoundary = if (cell.east.exists(cell.isLinked(_))) " " else "|"
+          top += body + eastBoundary
+
+          val southBoundary = if (cell.south.exists(cell.isLinked(_))) "   " else "---"
+          bottom += southBoundary + "+"
+        }
+
+        output += top + "\n"
+        output += bottom + "\n"
+      }
+
+      output
+    }
+  }
+}
+
+object Main extends App {
+  println(Grid(10,10).show)
+  val g = Grid(4,4)
+  BinaryTree.on(g)
+  println(g.show)
 }
