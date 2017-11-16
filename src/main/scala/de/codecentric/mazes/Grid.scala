@@ -106,8 +106,11 @@ object Grid {
 }
 
 object Main extends App {
-  println(Grid(10,10).show)
-  val g = Grid(4,4)
-  BinaryTree.on(g)
-  println(g.show)
+  val g1 = Grid(8,20)
+  BinaryTree.on(g1)
+  println(g1.show)
+
+  val g2 = Grid(8,20)
+  SideWinder.on(g2)
+  println(g2.show)
 }
